@@ -1,0 +1,174 @@
+yarn init -y
+yarn add sucrase nodemon sequelize-cli eslint prettier eslint-config-prettier eslint-plugin-prettier babel-eslint sequelize-cli -D
+yarn eslint --init
+yarn add express sequelize pg pg-hstore dotenv
+
+deletar package-lock.json
+yarn
+==================================================
+criar nodemon.json
+{
+  "exacMap": {
+    "js": "node -r sucrase/register"
+  }
+}
+
+module.exports = {
+  env: {
+    es6: true
+  },
+  extends: ["plugin:react/recommended", "airbnb", "prettier", "prettier/react"],
+  globals: {
+    Atomics: "readonly",
+    SharedArrayBuffer: "readonly",
+    __DEV__: "readonly"
+  },
+  parser: "babel-eslint",
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true
+    },
+    ecmaVersion: 2018,
+    sourceType: "module"
+  },
+  plugins: ["react", "prettier", "react-hooks"],
+  rules: {
+    "prettier/prettier": "error",
+    "class-methods-use-this": "off",
+    "no-param-reassign": "off",
+    camelcase: "off",
+    "no-unused-vars": ["error", { argsIgnorePattern: "next" }],
+    "react/jsx-filename-extension": [
+      "warn",
+      {
+        extensions: [".jsx", ".js"]
+      }
+    ],
+    "import/prefer-default-export": "off",
+    "no-console": ["error", { allow: ["tron"] }],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  }
+};
+
+criar .prettierrc
+{
+  "singleQuote": true,
+  "trailingComma": "es5"
+}
+
+criar .editorconfig
+root = true
+
+[*]
+end_of_line = lf
+indent_style = space
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+criar nodemon.json
+{
+  "execMap": {
+    "js": "node -r sucrase/register"
+  }
+}
+
+criar scripts package.json
+"scripts": {
+    "dev": "nodemon src/server.js",
+    "dev:debug": "nodemon --inspect src/server.js"
+  },
+
+criar \.vscode\launch.json
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Launch Program",
+      "protocol": "inspector",
+      "restart": true
+    }
+  ]
+}
+
+criar .sequelizerc
+const { resolve } = require('path');
+
+module.exports = {
+  config: resolve(__dirname, 'src', 'config', 'database.js'),
+  'models-path': resolve(__dirname, 'src', 'app', 'models'),
+  'migrations-path': resolve(__dirname, 'src', 'database', 'migrations'),
+  'seeders-path': resolve(__dirname, 'src', 'database', 'seeds'),
+};
+==================================================
+docker run --name database -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres:11
+
+yarn add bcryptjs jsonwebtoken yup
+
+yarn sequelize migration:create --name=create-users
+yarn sequelize db:migrate
+yarn sequelize seed:generate --name admin-user
+yarn sequelize db:seed:all
+yarn sequelize migration:create --name=create-students
+yarn sequelize migration:create --name=create-plans
+==================================================
+.env
+definir variáveis de ambiente
+==================================================
+src/config/database.js
+setar database configs com as variáveis de ambiente
+
+src/database/index.js
+criar classe db e inicializar conexão com o banco
+==================================================
+0. Préconfigs
+
+src/routes.js
+criar arquivo das rotas da aplicação utilizando o express
+
+src/app.js
+criar classe app cujo construtor roda express, utilizar rotas do arquivo de rotas e middleware do json, importar database, importar dotenv
+
+src/server.js
+criar arquivo que representa o server e colocar em listen
+
+src/app/models/User.js (partir desse padrão)
+criar classe User que representa a model user da aplicação, extendendo Model do sequelize, fazendo hash da senha pra outro campo como hook, inicializar model no database
+==================================================
+1. Autenticação
+
+src/config/auth.js
+set configs de autenticação com as variáveis de ambiente
+
+src/app/middlewares/auth.js
+criar função de autenticação do usuário com jsonwebtoken, lembrar de usar o middleware nas rotas da aplicação
+
+src/app/controllers/SessionController
+criar classe da sessão do usuário em um controller, função store, para criar a sessão, utilizando validação de schema com yup e de autenticação com jsonwebtoken, lembrar de definir a rota do controller no arquivo de rotas
+==================================================
+2. Cadastro de alunos
+
+criar migration da tabela de students
+
+src/app/models/Student.js
+criar model class de estudantes, inicializar no database
+
+src/app/controllers/StudentController.js
+criar controller class para cadastrar estudantes, inicializar nas rotas, criar store/update
+==================================================
+1. Gestão de planos
+
+criar migration da tabela de plans
+
+src/app/models/Plan.js
+criar model class de estudantes, inicializar no database
+
+src/app/controllers/PlanController.js
+criar controller class para cadastrar estudantes, inicializar nas rotas, criar store/update
